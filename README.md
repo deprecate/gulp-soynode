@@ -49,8 +49,6 @@ gulp.task('watch', function() {
 
 Options can be set via `soynode(options)`, the keys can contain the following:
 
-- `tmpDir` {string} Path to a directory where temporary files will be written during compilation. {Deprecated: use outputDir}
-  [Default: /tmp/soynode]
 - `inputDir` {string} Optional path to a directory where files will be read. When compiled from a directory, this option will be overwritten with the caller inputDir. [Default: process.cwd()]
 - `outputDir` {string} Path to a directory where files will be written. [Default: null]
 - `eraseTemporaryFiles` {boolean} Whether to erase temporary files after a compilation.
