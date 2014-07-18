@@ -12,13 +12,13 @@ module.exports = function(options) {
   options = options || {};
   options.uniqueDir = false;
   options.loadCompiledTemplates = false;
-  options.outputDir = path.resolve(process.cwd(), options.outputDir || '/tmp/soynode');
+  options.outputDir = path.resolve(options.outputDir || '/tmp/soynode');
 
-  var filepaths = [];
+  var files = [];
   var pauseStream = ps();
 
   return new Combine(
-    through.obj(spyFilePathsThrough(filepaths, pauseStream)),
+    through.obj(spyFileThrough(files, pauseStream)),
     pauseStream.pause(),
     through.obj(function() {
       var stream = this;
@@ -27,18 +27,21 @@ module.exports = function(options) {
         this.emit('error', new gutil.PluginError('gulp-soynode', 'Option `allowDynamicRecompile` is not supported, use `gulp.watch` instead.'));
       }
 
+      var filepaths = files.map(function(file) {
+        return path.relative(file.cwd, file.path);
+      });
+
       soynode.setOptions(options);
       soynode.compileTemplateFiles(filepaths, function(err) {
         if (err) {
           this.emit('error', new gutil.PluginError('gulp-soynode', err));
         }
 
-        filepaths.forEach(function(filepath) {
-          var soypath = gutil.replaceExtension(filepath, '.soy.js');
-          var file = new gutil.File({
-            contents: fs.readFileSync(path.join(options.outputDir, soypath)),
-            path: soypath
-          });
+        files.forEach(function(file) {
+          var relative = path.relative(file.cwd, file.path);
+          var soypath = gutil.replaceExtension(relative, '.soy.js');
+          file.contents = fs.readFileSync(path.join(options.outputDir, soypath));
+          file.path = gutil.replaceExtension(file.path, '.soy.js');
           stream.emit('data', file);
         });
 
@@ -49,13 +52,13 @@ module.exports = function(options) {
 };
 
 /**
- * Spy files through stream and buffer their paths into `filepaths` array
+ * Spy files through stream and buffer into `files` array
  * reference. When the stream emits `finish` event the stream is resumed
  * automatically and the flow is continued.
- * @param {Array} filepaths Empty array to buffer paths captured by the spy.
+ * @param {Array} files Empty array to buffer files captured by the spy.
  * @param {Stream} pauseStream Pause stream that controls the flow.
  */
-function spyFilePathsThrough(filepaths, pauseStream) {
+function spyFileThrough(files, pauseStream) {
   return function(file, enc, cb) {
     if (file.isNull()) {
       this.push(file);
@@ -68,8 +71,7 @@ function spyFilePathsThrough(filepaths, pauseStream) {
     }
 
     this.on('finish', pauseStream.resume);
-    file.path = path.relative(file.cwd, file.path);
-    filepaths.push(file.path);
+    files.push(file);
     this.push(file);
     cb();
   };
