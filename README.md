@@ -49,10 +49,11 @@ gulp.task('watch', function() {
 
 Options can be set via `soynode(options)`, the keys can contain the following:
 
+- `renderSoyWeb` {boolean} Whether SoyWeb templates will be rendered automatically. It deliberately allows to includes dummy data so the designer can get a feel for how the task list will appear with real data rather with minimal copy and paste. For more information visit [http://plovr.com/soyweb.html](http://plovr.com/soyweb.html). [Default: false]
+- `renderSoyWebFileExtension` {string} File extension of the rendered SoyWeb file. Relevant when your Soy template outputs other formats, like `.md`. [Default: .html]
 - `inputDir` {string} Optional path to a directory where files will be read. When compiled from a directory, this option will be overwritten with the caller inputDir. [Default: process.cwd()]
 - `outputDir` {string} Path to a directory where files will be written. [Default: null]
-- `eraseTemporaryFiles` {boolean} Whether to erase temporary files after a compilation.
-[Default: false]
+- `eraseTemporaryFiles` {boolean} Whether to erase temporary files after a compilation. [Default: false]
 - `concatOutput` {boolean} Whether the compiled soy.js files should be joined into a single file. This is helpful for loading templates in a browser and simplest to use when `outputDir` is explicitly set and `uniqueDir` is false. [Default: false]
 - `concatFileName` {string} File name used for concatenated files, only relevant when concatOutput is true, ".soy.concat.js" is appended, so don't include ".js" yourself. [Default: compiled]
 

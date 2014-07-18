@@ -10,9 +10,18 @@ var through = require('through2');
 
 module.exports = function(options) {
   options = options || {};
-  options.uniqueDir = false;
-  options.loadCompiledTemplates = false;
-  options.outputDir = path.resolve(options.outputDir || '/tmp/soynode');
+
+  // Resolve internal options.
+  var optionsInternal = {};
+  optionsInternal.renderSoyWeb = options.renderSoyWeb;
+  optionsInternal.renderSoyWebFileExtension = options.renderSoyWebFileExtension || '.html';
+  delete options.renderSoyWeb;
+  delete options.renderSoyWebFileExtension;
+
+  // Resolve soynode options.
+  var optionsSoynode = options;
+  optionsSoynode.uniqueDir = false;
+  optionsSoynode.outputDir = path.resolve(options.outputDir || '/tmp/soynode');
 
   var files = [];
   var pauseStream = ps();
@@ -21,28 +30,45 @@ module.exports = function(options) {
     through.obj(spyFileThrough(files, pauseStream)),
     pauseStream.pause(),
     through.obj(function() {
-      var stream = this;
-
-      if (options.allowDynamicRecompile) {
+      // Discourage usage of `allowDynamicRecompile` option.
+      if (optionsSoynode.allowDynamicRecompile) {
         this.emit('error', new gutil.PluginError('gulp-soynode', 'Option `allowDynamicRecompile` is not supported, use `gulp.watch` instead.'));
       }
+      // When rendering soyweb templates make sure to load compiled templates.
+      if (optionsInternal.renderSoyWeb) {
+        if (optionsSoynode.loadCompiledTemplates === false) {
+          this.emit('error', new gutil.PluginError('gulp-soynode', 'Option `renderSoyWeb` requires `loadCompiledTemplates` to be enabled.'));
+        }
+      }
 
+      var stream = this;
       var filepaths = files.map(function(file) {
         return path.relative(file.cwd, file.path);
       });
 
-      soynode.setOptions(options);
+      soynode.setOptions(optionsSoynode);
       soynode.compileTemplateFiles(filepaths, function(err) {
         if (err) {
           this.emit('error', new gutil.PluginError('gulp-soynode', err));
         }
-
         files.forEach(function(file) {
           var relative = path.relative(file.cwd, file.path);
           var soypath = gutil.replaceExtension(relative, '.soy.js');
-          file.contents = fs.readFileSync(path.join(options.outputDir, soypath));
-          file.path = gutil.replaceExtension(file.path, '.soy.js');
+          var compiled = new gutil.File({
+            base: file.base,
+            contents: fs.readFileSync(path.join(optionsSoynode.outputDir, soypath)),
+            cwd: file.cwd,
+            path: gutil.replaceExtension(file.path, '.soy.js')
+          });
+
+          if (optionsInternal.renderSoyWeb) {
+            try {
+              file = renderSoyWeb(file, optionsInternal);
+            } catch(err) {}
+          }
+
           stream.emit('data', file);
+          stream.emit('data', compiled);
         });
 
         stream.emit('end');
@@ -50,6 +76,26 @@ module.exports = function(options) {
     })
   );
 };
+
+/**
+ * This method allows templates to be rendered by SoyWeb. It deliberately
+ * includes dummy data so the designer can get a feel for how the task list
+ * will appear with real data rather with minimal copy and paste. For more
+ * information visit: http://plovr.com/soyweb.html
+ * @param {File} file The soy template file.
+ * @param {object} optionsInternal
+ * @return {File} Returns a file containing the rendered SoyWeb content.
+ */
+function renderSoyWeb(file, optionsInternal) {
+  var namespace = path.basename(file.path, '.soy');
+  var rendered = new gutil.File({
+    base: file.base,
+    contents: new Buffer(soynode.render(namespace + '.soyweb')),
+    cwd: file.cwd,
+    path: gutil.replaceExtension(file.path, optionsInternal.renderSoyWebFileExtension)
+  });
+  return rendered;
+}
 
 /**
  * Spy files through stream and buffer into `files` array
