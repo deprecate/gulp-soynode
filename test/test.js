@@ -7,14 +7,18 @@ var path = require('path');
 
 module.exports = {
   testCompileTemplatesGlobpath: function(test) {
-    gulp.src('test/assets/**/*.soy')
+    gulp.src(['test/assets/**/*.soy', '!test/assets/static/*.soy'])
       .pipe(soynode())
       .pipe(gutil.buffer(function(err, files) {
-        test.equal(files.length, 2);
-        assertFilepath(test, files[0], 'valid.soy.js');
-        assertFilepath(test, files[1], 'foo/valid.soy.js');
-        assertFilesize(test, files[0], 346);
-        assertFilesize(test, files[1], 343);
+        test.equal(files.length, 4);
+        assertFilepath(test, files[0], 'valid.soy');
+        assertFilepath(test, files[1], 'valid.soy.js');
+        assertFilepath(test, files[2], 'foo/valid.soy');
+        assertFilepath(test, files[3], 'foo/valid.soy.js');
+        assertFilesize(test, files[0], 96);
+        assertFilesize(test, files[1], 346);
+        assertFilesize(test, files[2], 95);
+        assertFilesize(test, files[3], 343);
         test.done();
       }));
   },
@@ -23,24 +27,47 @@ module.exports = {
     gulp.src([__dirname + '/assets/valid.soy', __dirname + '/assets/foo/valid.soy'])
       .pipe(soynode())
       .pipe(gutil.buffer(function(err, files) {
-        test.equal(files.length, 2);
-        assertFilepath(test, files[0], 'valid.soy.js');
+        test.equal(files.length, 4);
+        assertFilepath(test, files[0], 'valid.soy');
         assertFilepath(test, files[1], 'valid.soy.js');
-        assertFilesize(test, files[0], 346);
-        assertFilesize(test, files[1], 343);
+        assertFilepath(test, files[2], 'valid.soy');
+        assertFilepath(test, files[3], 'valid.soy.js');
+        assertFilesize(test, files[0], 96);
+        assertFilesize(test, files[1], 346);
+        assertFilesize(test, files[2], 95);
+        assertFilesize(test, files[3], 343);
         test.done();
       }));
   },
 
   testCompileTemplatesMixedpath: function(test) {
-    gulp.src(['test/assets/*.soy', __dirname + '/assets/foo/valid.soy'])
+    gulp.src(['test/assets/*.soy', '!test/assets/static/*.soy', __dirname + '/assets/foo/valid.soy'])
       .pipe(soynode())
       .pipe(gutil.buffer(function(err, files) {
-        test.equal(files.length, 2);
-        assertFilepath(test, files[0], 'valid.soy.js');
+        test.equal(files.length, 4);
+        assertFilepath(test, files[0], 'valid.soy');
         assertFilepath(test, files[1], 'valid.soy.js');
-        assertFilesize(test, files[0], 346);
-        assertFilesize(test, files[1], 343);
+        assertFilepath(test, files[2], 'valid.soy');
+        assertFilepath(test, files[3], 'valid.soy.js');
+        assertFilesize(test, files[0], 96);
+        assertFilesize(test, files[1], 346);
+        assertFilesize(test, files[2], 95);
+        assertFilesize(test, files[3], 343);
+        test.done();
+      }));
+  },
+
+  testCompileTemplatesSoyWeb: function(test) {
+    gulp.src('test/assets/static/*.soy')
+      .pipe(soynode({
+        renderSoyWeb: true
+      }))
+      .pipe(gutil.buffer(function(err, files) {
+        test.equal(files.length, 2);
+        assertFilepath(test, files[0], 'soyweb.html');
+        assertFilepath(test, files[1], 'soyweb.soy.js');
+        assertFilesize(test, files[0], 520);
+        assertFilesize(test, files[1], 1709);
         test.done();
       }));
   }
