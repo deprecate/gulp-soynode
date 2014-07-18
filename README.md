@@ -4,13 +4,11 @@
 
 *Issues with the output should be reported on the soynode [issue tracker](https://github.com/Medium/soynode/issues).*
 
-
 ## Install
 
 ```bash
 $ npm install --save-dev gulp-soynode
 ```
-
 
 ## Usage
 
