@@ -4,7 +4,7 @@ var Combine = require('stream-combiner');
 var fs = require('fs');
 var gutil = require('gulp-util');
 var path = require('path');
-var pauseStream = require('pause-stream')();
+var ps = require('pause-stream');
 var soynode = require('soynode');
 var through = require('through2');
 
@@ -14,9 +14,10 @@ module.exports = function(options) {
   options.outputDir = path.resolve(process.cwd(), options.outputDir || '/tmp/soynode');
 
   var filepaths = [];
+  var pauseStream = ps();
 
   return new Combine(
-    through.obj(spyFilePathsThrough(filepaths)),
+    through.obj(spyFilePathsThrough(filepaths, pauseStream)),
     pauseStream.pause(),
     through.obj(function() {
       var stream = this;
@@ -51,8 +52,9 @@ module.exports = function(options) {
  * reference. When the stream emits `finish` event the stream is resumed
  * automatically and the flow is continued.
  * @param {Array} filepaths Empty array to buffer paths captured by the spy.
+ * @param {Stream} pauseStream Pause stream that controls the flow.
  */
-function spyFilePathsThrough(filepaths) {
+function spyFilePathsThrough(filepaths, pauseStream) {
   return function(file, enc, cb) {
     if (file.isNull()) {
       this.push(file);
