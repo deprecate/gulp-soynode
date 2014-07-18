@@ -1,0 +1,39 @@
+{
+  "name": "gulp-soynode",
+  "version": "0.3.0",
+  "description": "Gulp plugin using soynode for working with Closure Templates, aka Soy.",
+  "license": "MIT",
+  "repository": "eduardolundgren/gulp-soynode",
+  "author": {
+    "name": "Eduardo Lundgren",
+    "email": "edua@rdo.io",
+    "url": "http://eduardo.io"
+  },
+  "engines": {
+    "node": ">=0.11.0"
+  },
+  "files": [
+    "index.js"
+  ],
+  "scripts": {
+    "test": "gulp test"
+  },
+  "keywords": [
+    "closure",
+    "google",
+    "gulpplugin",
+    "soy",
+    "templates"
+  ],
+  "dependencies": {
+    "gulp-util": "^2.2.20",
+    "pause-stream": "0.0.11",
+    "soynode": "eduardolundgren/soynode",
+    "stream-combiner": "^0.2.1",
+    "through2": "^0.5.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.6",
+    "gulp-nodeunit": "0.0.5"
+  }
+}
