@@ -11,6 +11,7 @@ var through = require('through2');
 module.exports = function(options) {
   options = options || {};
   options.uniqueDir = false;
+  options.loadCompiledTemplates = false;
   options.outputDir = path.resolve(process.cwd(), options.outputDir || '/tmp/soynode');
 
   var filepaths = [];
