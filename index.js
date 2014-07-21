@@ -63,14 +63,19 @@ module.exports = function(options) {
 
           if (optionsInternal.renderSoyWeb) {
             try {
+              // When building a static SoyWeb template make sure to only emit
+              // the output file, no need to emit the .soy and .soy.js.
               file = renderSoyWeb(file, optionsInternal);
+              compiled = null;
             } catch(err) {}
           }
 
           stream.emit('data', file);
-          stream.emit('data', compiled);
-        });
 
+          if (compiled) {
+            stream.emit('data', compiled);
+          }
+        });
         stream.emit('end');
       });
     })
