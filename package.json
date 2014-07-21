@@ -1,6 +1,6 @@
 {
   "name": "gulp-soynode",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Gulp plugin using soynode for working with Closure Templates, aka Soy.",
   "license": "MIT",
   "repository": "eduardolundgren/gulp-soynode",
