@@ -27,7 +27,7 @@ module.exports = function(options) {
   var pauseStream = ps();
 
   return new Combine(
-    through.obj(spyFileThrough(files, pauseStream)),
+    through.obj(spyFileThrough(files)).on('finish', pauseStream.resume),
     pauseStream.pause(),
     through.obj(function() {
       // Discourage usage of `allowDynamicRecompile` option.
@@ -123,9 +123,8 @@ function lookupNamespace(contents) {
  * reference. When the stream emits `finish` event the stream is resumed
  * automatically and the flow is continued.
  * @param {Array} files Empty array to buffer files captured by the spy.
- * @param {Stream} pauseStream Pause stream that controls the flow.
  */
-function spyFileThrough(files, pauseStream) {
+function spyFileThrough(files) {
   return function(file, enc, cb) {
     if (file.isNull()) {
       this.push(file);
@@ -137,7 +136,6 @@ function spyFileThrough(files, pauseStream) {
       return cb();
     }
 
-    this.on('finish', pauseStream.resume);
     files.push(file);
     this.push(file);
     cb();
