@@ -92,7 +92,7 @@ module.exports = function(options) {
  * @return {File} Returns a file containing the rendered SoyWeb content.
  */
 function renderSoyWeb(file, optionsInternal) {
-  var namespace = path.basename(file.path, '.soy');
+  var namespace = lookupNamespace(file.contents.toString());
   var rendered = new gutil.File({
     base: file.base,
     contents: new Buffer(soynode.render(namespace + '.soyweb')),
@@ -100,6 +100,22 @@ function renderSoyWeb(file, optionsInternal) {
     path: gutil.replaceExtension(file.path, optionsInternal.renderSoyWebFileExtension)
   });
   return rendered;
+}
+
+/**
+ * Lookups namespace from template content.
+ * @param {string} contents
+ * @return {string} The template namespace
+ */
+function lookupNamespace(contents) {
+  var startToken = '{namespace ';
+  var startPos = contents.indexOf(startToken);
+  var namespace = contents.substring(startPos + startToken.length, contents.indexOf('}'));
+  var spacePos = namespace.indexOf(' ');
+  if (spacePos > -1) {
+    namespace = namespace.substring(0, spacePos);
+  }
+  return namespace;
 }
 
 /**
