@@ -29,8 +29,7 @@
   ],
   "dependencies": {
     "gulp-util": "^2.2.20",
-    "pause-stream": "0.0.11",
-    "soynode": "eduardolundgren/soynode",
+    "soynode": "^0.4.0",
     "stream-combiner": "^0.2.1",
     "through2": "^0.5.1"
   },

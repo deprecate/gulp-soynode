@@ -4,7 +4,6 @@ var Combine = require('stream-combiner');
 var fs = require('fs');
 var gutil = require('gulp-util');
 var path = require('path');
-var ps = require('pause-stream');
 var soynode = require('soynode');
 var through = require('through2');
 
@@ -23,64 +22,79 @@ module.exports = function(options) {
   optionsSoynode.uniqueDir = false;
   optionsSoynode.outputDir = path.resolve(options.outputDir || '/tmp/soynode');
 
-  var files = [];
-  var pauseStream = ps();
-
   return new Combine(
-    through.obj(spyFileThrough(files)).on('finish', pauseStream.resume),
-    pauseStream.pause(),
-    through.obj(function() {
+    gutil.buffer(),
+    through.obj(function(files, enc, cb) {
       // Discourage usage of `allowDynamicRecompile` option.
       if (optionsSoynode.allowDynamicRecompile) {
-        this.emit('error', new gutil.PluginError('gulp-soynode', 'Option `allowDynamicRecompile` is not supported, use `gulp.watch` instead.'));
+        this.emit('error', new gutil.PluginError(
+        'gulp-soynode',
+        'Option `allowDynamicRecompile` is not supported, use `gulp.watch` instead.'));
       }
+
       // When rendering soyweb templates make sure to load compiled templates.
       if (optionsInternal.renderSoyWeb) {
         if (optionsSoynode.loadCompiledTemplates === false) {
-          this.emit('error', new gutil.PluginError('gulp-soynode', 'Option `renderSoyWeb` requires `loadCompiledTemplates` to be enabled.'));
+          this.emit('error', new gutil.PluginError(
+          'gulp-soynode',
+          'Option `renderSoyWeb` requires `loadCompiledTemplates` to be enabled.'));
         }
       }
 
-      var stream = this;
-      var filepaths = files.map(function(file) {
-        return path.relative(file.cwd, file.path);
-      });
-
-      soynode.setOptions(optionsSoynode);
-      soynode.compileTemplateFiles(filepaths, function(err) {
-        if (err) {
-          this.emit('error', new gutil.PluginError('gulp-soynode', err));
-        }
-        files.forEach(function(file) {
-          var relative = path.relative(file.cwd, file.path);
-          var soypath = gutil.replaceExtension(relative, '.soy.js');
-          var compiled = new gutil.File({
-            base: file.base,
-            contents: fs.readFileSync(path.join(optionsSoynode.outputDir, soypath)),
-            cwd: file.cwd,
-            path: gutil.replaceExtension(file.path, '.soy.js')
-          });
-
-          if (optionsInternal.renderSoyWeb) {
-            try {
-              // When building a static SoyWeb template make sure to only emit
-              // the output file, no need to emit the .soy and .soy.js.
-              file = renderSoyWeb(file, optionsInternal);
-              compiled = null;
-            } catch(err) {}
-          }
-
-          stream.emit('data', file);
-
-          if (compiled) {
-            stream.emit('data', compiled);
-          }
-        });
-        stream.emit('end');
-      });
-    })
-  );
+      compileFiles(this, files, optionsInternal, optionsSoynode, cb);
+    }));
 };
+
+/**
+ * Compiles buffered files from a through stream.
+ * @param {Stream} stream
+ * @param {array} files Buffered files array.
+ * @param {object} optionsInternal
+ * @param {object} optionsSoynode
+ * @param {function} cb
+ */
+function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
+  var filepaths = files.map(function(file) {
+    return path.relative(file.cwd, file.path);
+  });
+
+  soynode.setOptions(optionsSoynode);
+  soynode.compileTemplateFiles(filepaths, function(err) {
+    if (err) {
+      this.emit('error', new gutil.PluginError('gulp-soynode', err));
+    }
+
+    files.forEach(function(file) {
+      var relative = path.relative(file.cwd, file.path);
+      var soypath = gutil.replaceExtension(relative, '.soy.js');
+
+      var compiled = new gutil.File({
+        base: file.base,
+        contents: fs.readFileSync(path.join(optionsSoynode.outputDir, soypath)),
+        cwd: file.cwd,
+        path: gutil.replaceExtension(file.path, '.soy.js')
+      });
+
+      if (optionsInternal.renderSoyWeb) {
+        try {
+          // When building a static SoyWeb template make sure to only emit
+          // the output file, no need to emit the .soy and .soy.js.
+          file = renderSoyWeb(file, optionsInternal);
+          compiled = null;
+        } catch (err) {}
+      }
+
+      stream.emit('data', file);
+
+      if (compiled) {
+        stream.emit('data', compiled);
+      }
+    });
+
+    stream.emit('end');
+    cb();
+  });
+}
 
 /**
  * This method allows templates to be rendered by SoyWeb. It deliberately
@@ -116,28 +130,4 @@ function lookupNamespace(contents) {
     namespace = namespace.substring(0, spacePos);
   }
   return namespace;
-}
-
-/**
- * Spy files through stream and buffer into `files` array
- * reference. When the stream emits `finish` event the stream is resumed
- * automatically and the flow is continued.
- * @param {Array} files Empty array to buffer files captured by the spy.
- */
-function spyFileThrough(files) {
-  return function(file, enc, cb) {
-    if (file.isNull()) {
-      this.push(file);
-      return cb();
-    }
-
-    if (file.isStream()) {
-      this.emit('error', new gutil.PluginError('gulp-soynode', 'Streaming not supported'));
-      return cb();
-    }
-
-    files.push(file);
-    this.push(file);
-    cb();
-  };
 }
