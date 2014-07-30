@@ -13,8 +13,10 @@ module.exports = function(options) {
   // Resolve internal options.
   var optionsInternal = {};
   optionsInternal.renderSoyWeb = options.renderSoyWeb;
+  optionsInternal.renderSoyWebContext = options.renderSoyWebContext;
   optionsInternal.renderSoyWebFileExtension = options.renderSoyWebFileExtension || '.html';
   delete options.renderSoyWeb;
+  delete options.renderSoyWebContext;
   delete options.renderSoyWebFileExtension;
 
   // Resolve soynode options.
@@ -109,7 +111,7 @@ function renderSoyWeb(file, optionsInternal) {
   var namespace = lookupNamespace(file.contents.toString());
   var rendered = new gutil.File({
     base: file.base,
-    contents: new Buffer(soynode.render(namespace + '.soyweb')),
+    contents: new Buffer(soynode.render(namespace + '.soyweb', optionsInternal.renderSoyWebContext)),
     cwd: file.cwd,
     path: gutil.replaceExtension(file.path, optionsInternal.renderSoyWebFileExtension)
   });
