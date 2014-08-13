@@ -1,13 +1,17 @@
 'use strict';
 
 var Combine = require('stream-combiner');
+var closureTemplates = require('closure-templates');
 var fs = require('fs');
 var gutil = require('gulp-util');
 var path = require('path');
 var soynode = require('soynode');
+var spawn = require('child_process').spawn;
 var through = require('through2');
 
-module.exports = function(options) {
+var PATH_TO_MSG_EXTRACTOR = closureTemplates['SoyMsgExtractor.jar'];
+
+var gulpSoynode = function(options) {
   options = options || {};
 
   // Resolve internal options.
@@ -48,6 +52,48 @@ module.exports = function(options) {
 };
 
 /**
+ * Extracts messages from the given soy template files.
+ * @param {object} options
+ */
+gulpSoynode.lang = function(options) {
+  options = options || {};
+
+  return new Combine(
+    gutil.buffer(),
+    through.obj(function(files, enc, cb) {
+      var stream = this;
+      var outputFile = options.outputFile || '/tmp/soynode/translations.xlf';
+
+      var args = [
+        '-jar', PATH_TO_MSG_EXTRACTOR,
+        '--outputFile', outputFile
+      ];
+      args = args.concat(getFilePaths(files));
+
+      var process = spawn('java', args);
+      process.on('exit', function (err) {
+        if (err) {
+          stream.emit('error', new gutil.PluginError('gulp-soynode', err));
+          stream.emit('end');
+          cb();
+          return;
+        }
+
+        var translationFile = new gutil.File({
+          contents: fs.readFileSync(outputFile),
+          path: outputFile
+        });
+
+        stream.emit('data', translationFile);
+        stream.emit('end');
+        cb();
+      });
+    })
+  );
+};
+
+
+/**
  * Compiles buffered files from a through stream.
  * @param {Stream} stream
  * @param {array} files Buffered files array.
@@ -56,9 +102,7 @@ module.exports = function(options) {
  * @param {function} cb
  */
 function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
-  var filepaths = files.map(function(file) {
-    return path.relative(file.cwd, file.path);
-  });
+  var filepaths = getFilePaths(files);
 
   soynode.setOptions(optionsSoynode);
   soynode.compileTemplateFiles(filepaths, function(err) {
@@ -99,6 +143,17 @@ function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
 }
 
 /**
+ * Returns the file paths of the given files.
+ * @param {array} files Buffered files array.
+ * @return {array}
+ */
+function getFilePaths(files) {
+  return files.map(function(file) {
+    return path.relative(file.cwd, file.path);
+  });
+}
+
+/**
  * This method allows templates to be rendered by SoyWeb. It deliberately
  * includes dummy data so the designer can get a feel for how the task list
  * will appear with real data rather with minimal copy and paste. For more
@@ -133,3 +188,5 @@ function lookupNamespace(contents) {
   }
   return namespace;
 }
+
+module.exports = gulpSoynode;

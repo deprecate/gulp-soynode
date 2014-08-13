@@ -43,6 +43,21 @@ gulp.task('watch', function() {
 });
 ```
 
+## Message extraction
+You can also use `gulp-soynode` to extract all messages from your soy templates into a tlf file, which can be used for [translating](https://developers.google.com/closure/templates/docs/translation) them later. To use it, just call `soynode.lang` with the name of the file you want the messages to be extracted to:
+
+```js
+var gulp = require('gulp');
+var soynode = require('gulp-soynode');
+
+gulp.task('build-lang', function() {
+  gulp.src('views/*.soy')
+    .pipe(soynode.lang({
+      outputFile: 'translations/translations/*.soy'
+    }));
+});
+```
+
 ## API
 
 ### soynode(options)
@@ -59,6 +74,12 @@ Options can be set via `soynode(options)`, the keys can contain the following:
 - `concatFileName` {string} File name used for concatenated files, only relevant when concatOutput is true, ".soy.concat.js" is appended, so don't include ".js" yourself. [Default: compiled]
 
 See the soynode [options](https://github.com/Medium/soynode) for more information.
+
+### soynode.lang(options)
+
+Options can be set via `soynode.lang(options)`, the keys can contain the following:
+
+- `outputFile` {String} The path of the file with the resulting extracted messages. [Default: '/tmp/soynode/translations.xlf']
 
 Contributing
 ------------

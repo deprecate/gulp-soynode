@@ -28,6 +28,7 @@
     "templates"
   ],
   "dependencies": {
+    "closure-templates": "~20130416.1.0",
     "gulp-util": "^2.2.20",
     "soynode": "^0.4.0",
     "stream-combiner": "^0.2.1",

@@ -74,6 +74,16 @@ module.exports = {
         assertFilesize(test, files[3], 346);
         test.done();
       }));
+  },
+
+  testMessageExtraction: function(test) {
+    gulp.src(['test/assets/valid.soy'])
+      .pipe(soynode.lang())
+      .pipe(gutil.buffer(function(err, files) {
+        test.equal(files.length, 1);
+        test.equal(path.extname(files[0].path), '.xlf');
+        test.done();
+      }));
   }
 };
 
