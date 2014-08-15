@@ -53,7 +53,7 @@ var soynode = require('gulp-soynode');
 gulp.task('build-lang', function() {
   gulp.src('views/*.soy')
     .pipe(soynode.lang({
-      outputFile: 'translations/translations/*.soy'
+      outputFile: 'translations/translations.xlf'
     }));
 });
 ```
