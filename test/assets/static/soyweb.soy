@@ -15,7 +15,7 @@
     </div>
   {ifempty}
     <div class="{css tasks-complete}">
-      Nothing to do!
+      {msg desc="Displayed at end of task execution"}Nothing to do!{/msg}
     </div>
   {/foreach}
 </div>
@@ -28,7 +28,11 @@
 <!doctype>
 <html>
 <head>
-  <title>Static Soy template - This template is rendered automatically</title>
+  <title>
+    {msg desc="Title of static soy example page"}
+      Static Soy template - This template is rendered automatically
+    {/msg}
+  </title>
 </head>
 <body>
   {$content|noAutoescape}
