@@ -125,7 +125,7 @@ function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
         try {
           // When building a static SoyWeb template make sure to only emit
           // the output file, no need to emit the .soy and .soy.js.
-          file = renderSoyWeb(file, optionsInternal);
+          file = renderSoyWeb(file, optionsInternal, optionsSoynode);
           compiled = null;
         } catch (err) {}
       }
@@ -160,17 +160,25 @@ function getFilePaths(files) {
  * information visit: http://plovr.com/soyweb.html
  * @param {File} file The soy template file.
  * @param {object} optionsInternal
+ * @param {object} optionsSoynode
  * @return {File} Returns a file containing the rendered SoyWeb content.
  */
-function renderSoyWeb(file, optionsInternal) {
+function renderSoyWeb(file, optionsInternal, optionsSoynode) {
   var namespace = lookupNamespace(file.contents.toString());
-  var rendered = new gutil.File({
+
+  var rendered = soynode.render(
+    namespace + '.soyweb',
+    optionsInternal.renderSoyWebContext,
+    {},
+    optionsSoynode.locales ? optionsSoynode.locales[0] : null
+  );
+  var renderedFile = new gutil.File({
     base: file.base,
-    contents: new Buffer(soynode.render(namespace + '.soyweb', optionsInternal.renderSoyWebContext)),
+    contents: new Buffer(rendered),
     cwd: file.cwd,
     path: gutil.replaceExtension(file.path, optionsInternal.renderSoyWebFileExtension)
   });
-  return rendered;
+  return renderedFile;
 }
 
 /**
