@@ -112,7 +112,7 @@ function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
 
     files.forEach(function(file) {
       var relative = path.relative(file.cwd, file.path);
-      var soypath = gutil.replaceExtension(relative, '.soy.js');
+      var soypath = relative + '.js';
 
       var compiled = new gutil.File({
         base: file.base,

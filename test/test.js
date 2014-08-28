@@ -76,6 +76,19 @@ module.exports = {
       }));
   },
 
+  testNonSoyExtension: function(test) {
+    gulp.src(['test/assets/foo/valid.html'])
+      .pipe(soynode())
+      .pipe(gutil.buffer(function(err, files) {
+        test.equal(files.length, 2);
+        assertFilepath(test, files[0], 'valid.html');
+        assertFilepath(test, files[1], 'valid.soy.js');
+        assertFilesize(test, files[0], 99);
+        assertFilesize(test, files[1], 356);
+        test.done();
+      }));
+  },
+
   testMessageExtraction: function(test) {
     gulp.src(['test/assets/valid.soy'])
       .pipe(soynode.lang())
