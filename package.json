@@ -28,11 +28,11 @@
     "templates"
   ],
   "dependencies": {
-    "closure-templates": "~20130416.1.0",
-    "gulp-util": "^2.2.20",
-    "soynode": "^0.5.0",
+    "closure-templates": "^20140422.0.0",
+    "gulp-util": "^3.0.1",
+    "soynode": "^0.6.1",
     "stream-combiner": "^0.2.1",
-    "through2": "^0.5.1"
+    "through2": "^0.6.1"
   },
   "devDependencies": {
     "gulp": "^3.8.6",
