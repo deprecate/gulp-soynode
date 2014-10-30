@@ -16,9 +16,9 @@ module.exports = {
         assertFilepath(test, files[2], 'foo/valid.soy');
         assertFilepath(test, files[3], 'foo/valid.soy.js');
         assertFilesize(test, files[0], 96);
-        assertFilesize(test, files[1], 488);
+        assertFilesize(test, files[1], 533);
         assertFilesize(test, files[2], 95);
-        assertFilesize(test, files[3], 482);
+        assertFilesize(test, files[3], 527);
         test.done();
       }));
   },
@@ -33,9 +33,9 @@ module.exports = {
         assertFilepath(test, files[2], 'valid.soy');
         assertFilepath(test, files[3], 'valid.soy.js');
         assertFilesize(test, files[0], 96);
-        assertFilesize(test, files[1], 488);
+        assertFilesize(test, files[1], 533);
         assertFilesize(test, files[2], 95);
-        assertFilesize(test, files[3], 482);
+        assertFilesize(test, files[3], 527);
         test.done();
       }));
   },
@@ -50,9 +50,9 @@ module.exports = {
         assertFilepath(test, files[2], 'valid.soy');
         assertFilepath(test, files[3], 'valid.soy.js');
         assertFilesize(test, files[0], 96);
-        assertFilesize(test, files[1], 488);
+        assertFilesize(test, files[1], 533);
         assertFilesize(test, files[2], 95);
-        assertFilesize(test, files[3], 482);
+        assertFilesize(test, files[3], 527);
         test.done();
       }));
   },
@@ -71,7 +71,7 @@ module.exports = {
         assertFilesize(test, files[0], 520);
         assertFilesize(test, files[1], 520);
         assertFilesize(test, files[2], 96);
-        assertFilesize(test, files[3], 488);
+        assertFilesize(test, files[3], 533);
         test.done();
       }));
   },
@@ -84,7 +84,7 @@ module.exports = {
         assertFilepath(test, files[0], 'valid.html');
         assertFilepath(test, files[1], 'valid.soy.js');
         assertFilesize(test, files[0], 99);
-        assertFilesize(test, files[1], 507);
+        assertFilesize(test, files[1], 552);
         test.done();
       }));
   },
@@ -105,7 +105,7 @@ module.exports = {
         assertFilesize(test, files[0], 531);
         assertFilesize(test, files[1], 520);
         assertFilesize(test, files[2], 96);
-        assertFilesize(test, files[3], 488);
+        assertFilesize(test, files[3], 533);
         test.done();
       }));
   },

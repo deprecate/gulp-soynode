@@ -35,7 +35,7 @@
   </title>
 </head>
 <body>
-  {$content|noAutoescape}
+  {$content}
 </body>
 </html>
 {/template}
@@ -47,7 +47,7 @@
  */
 {template .soyweb}
 {call .demoPage}
-  {param content}
+  {param content kind="html"}
     {call .list}
       {param title: 'Food Shopping' /}
       {param items: [
