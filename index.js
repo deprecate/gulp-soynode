@@ -18,9 +18,11 @@ var gulpSoynode = function(options) {
   var optionsInternal = {};
   optionsInternal.renderSoyWeb = options.renderSoyWeb;
   optionsInternal.renderSoyWebContext = options.renderSoyWebContext;
+  optionsInternal.renderSoyWebInjectedData = options.renderSoyWebInjectedData;
   optionsInternal.renderSoyWebFileExtension = options.renderSoyWebFileExtension || '.html';
   delete options.renderSoyWeb;
   delete options.renderSoyWebContext;
+  delete options.renderSoyWebInjectedData;
   delete options.renderSoyWebFileExtension;
 
   // Resolve soynode options.
@@ -169,7 +171,7 @@ function renderSoyWeb(file, optionsInternal, optionsSoynode) {
   var rendered = soynode.render(
     namespace + '.soyweb',
     optionsInternal.renderSoyWebContext,
-    {},
+    optionsInternal.renderSoyWebInjectedData,
     optionsSoynode.locales ? optionsSoynode.locales[0] : null
   );
   var renderedFile = new gutil.File({
