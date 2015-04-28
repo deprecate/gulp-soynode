@@ -18,7 +18,7 @@ var gulpSoynode = function(options) {
   var optionsInternal = {};
   optionsInternal.renderSoyWeb = options.renderSoyWeb;
   optionsInternal.renderSoyWebContext = options.renderSoyWebContext;
-  optionsInternal.renderSoyWebInjectedData = options.renderSoyWebInjectedData;
+  optionsInternal.renderSoyWebInjectedData = options.renderSoyWebInjectedData || {};
   optionsInternal.renderSoyWebFileExtension = options.renderSoyWebFileExtension || '.html';
   delete options.renderSoyWeb;
   delete options.renderSoyWebContext;
