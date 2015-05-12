@@ -84,7 +84,22 @@ module.exports = {
         assertFilepath(test, files[0], 'valid.html');
         assertFilepath(test, files[1], 'valid.soy.js');
         assertFilesize(test, files[0], 99);
-        assertFilesize(test, files[1], 607);
+        assertFilesize(test, files[1], 582);
+        test.done();
+      }));
+  },
+
+  testCompileTranslatedTemplates: function(test) {
+    gulp.src(['test/assets/valid.soy'])
+      .pipe(soynode({
+        locales: ['en', 'pt-BR'],
+        messageFilePathFormat: 'test/assets/translations/translations_{LOCALE}.xlf'
+      }))
+      .pipe(gutil.buffer(function(err, files) {
+        test.equal(files.length, 3);
+        assertFilepath(test, files[0], 'valid.soy');
+        assertFilepath(test, files[1], 'valid_en.soy.js');
+        assertFilepath(test, files[2], 'valid_pt-BR.soy.js');
         test.done();
       }));
   },

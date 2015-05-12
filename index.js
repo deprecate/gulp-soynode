@@ -112,31 +112,41 @@ function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
       this.emit('error', new gutil.PluginError('gulp-soynode', err));
     }
 
+    var locales = optionsSoynode.locales || [''];
+
     files.forEach(function(file) {
-      var relative = path.relative(file.cwd, file.path);
-      var soypath = relative + '.js';
+      var soyFileAlreadyEmitted = false;
 
-      var compiled = new gutil.File({
-        base: file.base,
-        contents: fs.readFileSync(path.join(optionsSoynode.outputDir, soypath)),
-        cwd: file.cwd,
-        path: gutil.replaceExtension(file.path, '.soy.js')
+      locales.forEach(function(locale) {
+        var relative = path.relative(file.cwd, path.dirname(file.path));
+        var basename = path.basename(file.path, path.extname(file.path));
+        var relativePath = path.join(relative, basename) + ((locales.length > 1 && locale) ? '_' + locale : '') + '.soy.js';
+
+        var compiled = new gutil.File({
+          base: file.base,
+          contents: fs.readFileSync(path.join(optionsSoynode.outputDir, relativePath)),
+          cwd: file.cwd,
+          path: path.resolve(file.base, path.relative(file.base, relativePath))
+        });
+
+        if (optionsInternal.renderSoyWeb) {
+          try {
+            // When building a static SoyWeb template make sure to only emit
+            // the output file, no need to emit the .soy and .soy.js.
+            file = renderSoyWeb(file, optionsInternal, optionsSoynode);
+            compiled = null;
+          } catch (err) {}
+        }
+
+        if (!soyFileAlreadyEmitted) {
+          stream.emit('data', file);
+          soyFileAlreadyEmitted = true;
+        }
+
+        if (compiled) {
+          stream.emit('data', compiled);
+        }
       });
-
-      if (optionsInternal.renderSoyWeb) {
-        try {
-          // When building a static SoyWeb template make sure to only emit
-          // the output file, no need to emit the .soy and .soy.js.
-          file = renderSoyWeb(file, optionsInternal, optionsSoynode);
-          compiled = null;
-        } catch (err) {}
-      }
-
-      stream.emit('data', file);
-
-      if (compiled) {
-        stream.emit('data', compiled);
-      }
     });
 
     stream.emit('end');
