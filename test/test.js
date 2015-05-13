@@ -82,9 +82,9 @@ module.exports = {
       .pipe(gutil.buffer(function(err, files) {
         test.equal(files.length, 2);
         assertFilepath(test, files[0], 'valid.html');
-        assertFilepath(test, files[1], 'valid.soy.js');
+        assertFilepath(test, files[1], 'valid.html.js');
         assertFilesize(test, files[0], 99);
-        assertFilesize(test, files[1], 582);
+        assertFilesize(test, files[1], 607);
         test.done();
       }));
   },

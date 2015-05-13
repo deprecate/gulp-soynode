@@ -118,9 +118,10 @@ function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
       var soyFileAlreadyEmitted = false;
 
       locales.forEach(function(locale) {
+        var extname = path.extname(file.path);
         var relative = path.relative(file.cwd, path.dirname(file.path));
-        var basename = path.basename(file.path, path.extname(file.path));
-        var relativePath = path.join(relative, basename) + ((locales.length > 1 && locale) ? '_' + locale : '') + '.soy.js';
+        var basename = path.basename(file.path, extname);
+        var relativePath = path.join(relative, basename) + ((locales.length > 1 && locale) ? '_' + locale : '') + extname + '.js';
 
         var compiled = new gutil.File({
           base: file.base,
