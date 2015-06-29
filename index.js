@@ -109,7 +109,8 @@ function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
   soynode.setOptions(optionsSoynode);
   soynode.compileTemplateFiles(filepaths, function(err) {
     if (err) {
-      this.emit('error', new gutil.PluginError('gulp-soynode', err));
+      stream.emit('error', new gutil.PluginError('gulp-soynode', err));
+      return;
     }
 
     var locales = optionsSoynode.locales || [''];

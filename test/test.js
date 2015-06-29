@@ -7,7 +7,7 @@ var path = require('path');
 
 module.exports = {
   testCompileTemplatesGlobpath: function(test) {
-    gulp.src(['test/assets/**/*.soy', '!test/assets/foo/soyweb.soy', '!test/assets/static/*.soy'])
+    gulp.src(['test/assets/**/*.soy', '!test/assets/foo/soyweb.soy', '!test/assets/static/*.soy', '!test/assets/invalid.soy'])
       .pipe(soynode())
       .pipe(gutil.buffer(function(err, files) {
         test.equal(files.length, 4);
@@ -133,6 +133,20 @@ module.exports = {
         test.equal(path.extname(files[0].path), '.xlf');
         test.done();
       }));
+  },
+
+  testInvalidSoyTemplate: function(test) {
+    var originalConsoleError = console.error;
+    console.error = function() {};
+
+    gulp.src(['test/assets/invalid.soy'])
+      .pipe(soynode())
+      .on('error', function(err) {
+        console.error = originalConsoleError;
+        test.ok(err);
+        this.emit('end');
+        test.done();
+      })
   }
 };
 
