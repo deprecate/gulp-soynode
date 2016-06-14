@@ -117,15 +117,16 @@ function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
 
     files.forEach(function(file) {
       var soyFileAlreadyEmitted = false;
+      var extname = path.extname(file.path);
+      var relative = path.relative(file.cwd, path.dirname(file.path));
+      var basename = path.basename(file.path, extname);
+      var base = file.base;
 
       locales.forEach(function(locale) {
-        var extname = path.extname(file.path);
-        var relative = path.relative(file.cwd, path.dirname(file.path));
-        var basename = path.basename(file.path, extname);
         var relativePath = path.join(relative, basename) + ((locales.length > 1 && locale) ? '_' + locale : '') + extname + '.js';
 
         var compiled = new gutil.File({
-          base: file.base,
+          base: base,
           contents: fs.readFileSync(path.join(optionsSoynode.outputDir, relativePath)),
           cwd: file.cwd,
           path: path.resolve(file.base, path.relative(file.base, relativePath))

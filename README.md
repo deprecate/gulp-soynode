@@ -17,7 +17,7 @@ var gulp = require('gulp');
 var soynode = require('gulp-soynode');
 
 gulp.task('build', function() {
-  gulp.src('views/*.soy')
+  return gulp.src('views/*.soy')
     .pipe(soynode())
     .pipe(gulp.dest('build'));
 });
@@ -26,7 +26,7 @@ gulp.task('build', function() {
 You can also watch for changes to rebuild all templates:
 
 ```js
-gulp.task('watch', function() {
+gulp.task('watch', function(done) {
   gulp.watch('views/*.soy', ['build']);
 });
 ```
@@ -34,7 +34,7 @@ gulp.task('watch', function() {
 Or, if you prefer, rebuild only one the modified file:
 
 ```js
-gulp.task('watch', function() {
+gulp.task('watch', function(done) {
   gulp.watch('test/*.soy', function(file) {
     gulp.src(file.path)
       .pipe(soynode())
@@ -51,7 +51,7 @@ var gulp = require('gulp');
 var soynode = require('gulp-soynode');
 
 gulp.task('build-lang', function() {
-  gulp.src('views/*.soy')
+  return gulp.src('views/*.soy')
     .pipe(soynode.lang({
       outputFile: 'translations/translations_en.xlf'
     }));
@@ -65,7 +65,7 @@ var gulp = require('gulp');
 var soynode = require('gulp-soynode');
 
 gulp.task('build', function() {
-  gulp.src('views/*.soy')
+  return gulp.src('views/*.soy')
     .pipe(soynode({
       locales: ['en', 'pt-BR'],
         messageFilePathFormat: 'translations/translations_{LOCALE}.xlf'
