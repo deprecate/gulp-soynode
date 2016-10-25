@@ -158,6 +158,16 @@ function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
 }
 
 /**
+ * Calls the given arg if it's a function. Otherwise, just returns it as it is.
+ * @param {*} arg
+ * @param {!Object} file File object to pass to called function.
+ * @return {*}
+ */
+function callFunctionArg(arg, file) {
+  return (typeof arg === 'function') ? arg(file) : arg;
+}
+
+/**
  * Returns the file paths of the given files.
  * @param {array} files Buffered files array.
  * @return {array}
@@ -183,8 +193,8 @@ function renderSoyWeb(file, optionsInternal, optionsSoynode) {
 
   var rendered = soynode.render(
     namespace + '.soyweb',
-    optionsInternal.renderSoyWebContext,
-    optionsInternal.renderSoyWebInjectedData,
+    callFunctionArg(optionsInternal.renderSoyWebContext, file),
+    callFunctionArg(optionsInternal.renderSoyWebInjectedData, file),
     optionsSoynode.locales ? optionsSoynode.locales[0] : null
   );
   var renderedFile = new gutil.File({

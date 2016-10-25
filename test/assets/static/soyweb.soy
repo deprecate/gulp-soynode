@@ -44,12 +44,13 @@
  * This template will be rendered by SoyWeb when the user loads static.soy.
  * It deliberately includes dummy data so the designer can get a feel for how
  * the task list will appear with real data rather with minimal copy and paste.
+ * @param? title
  */
 {template .soyweb}
 {call .demoPage}
   {param content kind="html"}
     {call .list}
-      {param title: 'Food Shopping' /}
+      {param title: $title ?: 'Food Shopping' /}
       {param items: [
         ['indent': 0, 'name': 'cheese' ],
         ['indent': 0, 'name': 'crackers' ],

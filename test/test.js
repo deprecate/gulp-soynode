@@ -76,6 +76,56 @@ module.exports = {
       }));
   },
 
+  testCompileTemplatesSoyWebWithData: function(test) {
+    gulp.src(['test/assets/static/soyweb.soy', 'test/assets/foo/soyweb.soy'])
+      .pipe(soynode({
+        renderSoyWeb: true,
+        renderSoyWebContext: {
+          title: 'Test Title'
+        }
+      }))
+      .pipe(gutil.buffer(function(err, files) {
+        test.equal(files.length, 2);
+
+        assertFilepath(test, files[0], 'soyweb.html');
+        var content = files[0].contents.toString();
+        test.notEqual(-1, content.indexOf('<h1>Test Title</h1>'));
+
+        assertFilepath(test, files[1], 'soyweb.html');
+        content = files[1].contents.toString();
+        test.notEqual(-1, content.indexOf('<h1>Test Title</h1>'));
+        test.done();
+      }));
+  },
+
+  testCompileTemplatesSoyWebWithDataFromFunction: function(test) {
+    gulp.src(['test/assets/static/soyweb.soy', 'test/assets/foo/soyweb.soy'])
+      .pipe(soynode({
+        renderSoyWeb: true,
+        renderSoyWebContext: function(file) {
+          var title = 'Test Title 1';
+          if (file.path === path.resolve('test/assets/foo/soyweb.soy')) {
+            title = 'Test Title 2';
+          }
+          return {
+            title: title
+          };
+        }
+      }))
+      .pipe(gutil.buffer(function(err, files) {
+        test.equal(files.length, 2);
+
+        assertFilepath(test, files[0], 'soyweb.html');
+        var content = files[0].contents.toString();
+        test.notEqual(-1, content.indexOf('<h1>Test Title 1</h1>'));
+
+        assertFilepath(test, files[1], 'soyweb.html');
+        content = files[1].contents.toString();
+        test.notEqual(-1, content.indexOf('<h1>Test Title 2</h1>'));
+        test.done();
+      }));
+  },
+
   testNonSoyExtension: function(test) {
     gulp.src(['test/assets/foo/valid.html'])
       .pipe(soynode())
@@ -146,7 +196,7 @@ module.exports = {
         test.ok(err);
         this.emit('end');
         test.done();
-      })
+      });
   }
 };
 

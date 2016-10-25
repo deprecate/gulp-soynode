@@ -81,8 +81,9 @@ gulp.task('build', function() {
 Options can be set via `soynode(options)`, the keys can contain the following:
 
 - `renderSoyWeb` {boolean} Whether SoyWeb templates will be rendered automatically. It deliberately allows to includes dummy data so the designer can get a feel for how the task list will appear with real data rather with minimal copy and paste. For more information visit [http://plovr.com/soyweb.html](http://plovr.com/soyweb.html). [Default: false]
-- `renderSoyWebContext` {object} Default render context of rendered SoyWeb file. [Default: null]
+- `renderSoyWebContext` {Object|function()} Default render context of rendered SoyWeb file, or a function that is called with each handled file, returning the context object for it. [Default: null]
 - `renderSoyWebFileExtension` {string} File extension of the rendered SoyWeb file. Relevant when your Soy template outputs other formats, like `.md`. [Default: .html]
+- `renderSoyWebInjectedData` {Object|function()} Object with injected data to be used when rendering SoyWeb files, or a function that is called with each handled file, returning the injected data for it. [Default: null]
 - `inputDir` {string} Optional path to a directory where files will be read. When compiled from a directory, this option will be overwritten with the caller inputDir. [Default: process.cwd()]
 - `outputDir` {string} Path to a directory where files will be written. [Default: null]
 - `eraseTemporaryFiles` {boolean} Whether to erase temporary files after a compilation. [Default: false]
