@@ -138,7 +138,9 @@ function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
             // the output file, no need to emit the .soy and .soy.js.
             file = renderSoyWeb(file, optionsInternal, optionsSoynode);
             compiled = null;
-          } catch (err) {}
+          } catch (err) {
+            stream.emit('error', new gutil.PluginError('gulp-soynode', err));
+          }
         }
 
         if (!soyFileAlreadyEmitted) {
