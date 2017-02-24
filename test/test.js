@@ -72,6 +72,16 @@ module.exports = {
       }));
   },
 
+  testCompileInvideTemplatesSoyWeb: function(test) {
+    gulp.src(['test/assets/valid.soy'])
+      .pipe(soynode({
+        renderSoyWeb: true
+      }))
+      .on('error', function() {
+        test.done();
+      });
+  },
+
   testCompileTemplatesSoyWebWithData: function(test) {
     gulp.src(['test/assets/static/soyweb.soy', 'test/assets/foo/soyweb.soy'])
       .pipe(soynode({
