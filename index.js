@@ -132,7 +132,7 @@ function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
           path: path.resolve(file.base, path.relative(file.base, relativePath))
         });
 
-        if (optionsInternal.renderSoyWeb) {
+        if (optionsInternal.renderSoyWeb && hasSoyweb(file.contents.toString())) {
           try {
             // When building a static SoyWeb template make sure to only emit
             // the output file, no need to emit the .soy and .soy.js.
@@ -167,6 +167,15 @@ function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
  */
 function callFunctionArg(arg, file) {
   return (typeof arg === 'function') ? arg(file) : arg;
+}
+
+/**
+ * Checks for soyweb template in file.
+ * @param {string} contents
+ * @return {boolean} If the file contains a soyweb template
+ */
+function hasSoyweb(contents) {
+  return contents.indexOf(' .soyweb}') > -1;
 }
 
 /**
