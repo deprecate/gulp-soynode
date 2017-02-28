@@ -139,7 +139,7 @@ function compileFiles(stream, files, optionsInternal, optionsSoynode, cb) {
             file = renderSoyWeb(file, optionsInternal, optionsSoynode);
             compiled = null;
           } catch (err) {
-            stream.emit('error', new gutil.PluginError('gulp-soynode', err));
+            stream.emit('error', new gutil.PluginError('gulp-soynode', err.stack || err.message));
           }
         }
 
