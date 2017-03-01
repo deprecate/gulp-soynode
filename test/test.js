@@ -7,7 +7,7 @@ var path = require('path');
 
 module.exports = {
   testCompileTemplatesGlobpath: function(test) {
-    gulp.src(['test/assets/**/*.soy', '!test/assets/foo/soyweb.soy', '!test/assets/static/*.soy', '!test/assets/invalid.soy'])
+    gulp.src(['test/assets/**/*.soy', '!test/assets/foo/soyweb.soy', '!test/assets/partial/*.soy', '!test/assets/static/*.soy', '!test/assets/invalid.soy'])
       .pipe(soynode())
       .pipe(gutil.buffer(function(err, files) {
         test.equal(files.length, 4);
@@ -200,6 +200,20 @@ module.exports = {
         this.emit('end');
         test.done();
       });
+  },
+
+  testPartialSoyTemplate: function(test) {
+    gulp.src(['test/assets/partial/soyweb.soy', 'test/assets/partial/partial.soy'])
+      .pipe(soynode({
+        renderSoyWeb: true
+      }))
+      .pipe(gutil.buffer(function(err, files) {
+        assertFilepath(test, files[0], 'soyweb.html');
+        assertFilepath(test, files[1], 'partial.soy');
+        assertFilepath(test, files[2], 'partial.soy.js');
+        assertFilesize(test, files[0], 520);
+        test.done();
+      }));
   }
 };
 
