@@ -72,12 +72,13 @@ module.exports = {
       }));
   },
 
-  testCompileInvideTemplatesSoyWeb: function(test) {
-    gulp.src(['test/assets/valid.soy'])
+  testCompileInvalidTemplatesSoyWeb: function(test) {
+    gulp.src(['test/assets/partial/invalid.soy'])
       .pipe(soynode({
         renderSoyWeb: true
       }))
-      .on('error', function() {
+      .on('error', function(err) {
+        test.notEqual(-1, err.message.indexOf('invalid is not defined'));
         test.done();
       });
   },
