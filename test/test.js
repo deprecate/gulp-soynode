@@ -16,9 +16,9 @@ module.exports = {
         assertFilepath(test, files[2], 'foo/valid.soy');
         assertFilepath(test, files[3], 'foo/valid.soy.js');
         assertFilesize(test, files[0], 96);
-        assertFilesize(test, files[1], 588);
+        assertFilesize(test, files[1], 597);
         assertFilesize(test, files[2], 95);
-        assertFilesize(test, files[3], 582);
+        assertFilesize(test, files[3], 591);
         test.done();
       }));
   },
@@ -33,9 +33,9 @@ module.exports = {
         assertFilepath(test, files[2], 'valid.soy');
         assertFilepath(test, files[3], 'valid.soy.js');
         assertFilesize(test, files[0], 96);
-        assertFilesize(test, files[1], 588);
+        assertFilesize(test, files[1], 597);
         assertFilesize(test, files[2], 95);
-        assertFilesize(test, files[3], 582);
+        assertFilesize(test, files[3], 591);
         test.done();
       }));
   },
@@ -50,9 +50,9 @@ module.exports = {
         assertFilepath(test, files[2], 'valid.soy');
         assertFilepath(test, files[3], 'valid.soy.js');
         assertFilesize(test, files[0], 96);
-        assertFilesize(test, files[1], 588);
+        assertFilesize(test, files[1], 597);
         assertFilesize(test, files[2], 95);
-        assertFilesize(test, files[3], 582);
+        assertFilesize(test, files[3], 591);
         test.done();
       }));
   },
@@ -141,22 +141,7 @@ module.exports = {
         assertFilepath(test, files[0], 'valid.html');
         assertFilepath(test, files[1], 'valid.html.js');
         assertFilesize(test, files[0], 99);
-        assertFilesize(test, files[1], 607);
-        test.done();
-      }));
-  },
-
-  testCompileTranslatedTemplates: function(test) {
-    gulp.src(['test/assets/valid.soy'])
-      .pipe(soynode({
-        locales: ['en', 'pt-BR'],
-        messageFilePathFormat: 'test/assets/translations/translations_{LOCALE}.xlf'
-      }))
-      .pipe(gutil.buffer(function(err, files) {
-        test.equal(files.length, 3);
-        assertFilepath(test, files[0], 'valid.soy');
-        assertFilepath(test, files[1], 'valid_en.soy.js');
-        assertFilepath(test, files[2], 'valid_pt-BR.soy.js');
+        assertFilesize(test, files[1], 616);
         test.done();
       }));
   },
@@ -186,20 +171,6 @@ module.exports = {
         test.equal(path.extname(files[0].path), '.xlf');
         test.done();
       }));
-  },
-
-  testInvalidSoyTemplate: function(test) {
-    var originalConsoleError = console.error;
-    console.error = function() {};
-
-    gulp.src(['test/assets/invalid.soy'])
-      .pipe(soynode())
-      .on('error', function(err) {
-        console.error = originalConsoleError;
-        test.ok(err);
-        this.emit('end');
-        test.done();
-      });
   },
 
   testPartialSoyTemplate: function(test) {
